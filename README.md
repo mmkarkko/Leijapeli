@@ -7,5 +7,7 @@ Opiskelija forkkaa tämän repon omaa harjoitustyötään varten.
 Muokkaa gitlab.jyu.fi-palvelussa oman projektisi asetuksia, kuten projektin nimeä
 ja projektin kuvausta kohdasta Settings. 
 
+Voit muokata myös tätä README.md-tiedostoa ja kirjoittaa siihen projektisi kuvauksen. 
+
 Lue Git-versiohallinnan tarkemmat käyttöohjeet TIMistä: <https://tim.jyu.fi/view/kurssit/tie/ohj1/harjoitustyo/git>
 
