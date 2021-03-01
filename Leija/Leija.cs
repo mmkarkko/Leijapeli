@@ -13,7 +13,7 @@ using System.Collections.Generic;
 
 
 ///@author Miia Arkko
-///@version 8.2.2021
+///@version 1.3.2021
 /// <summary>
 /// Peli, jossa lännetään leijalla, kerätään pisteitä ja varotaan osumasta muihin esineisiin.
 /// </summary>
@@ -21,13 +21,13 @@ public class Leija : PhysicsGame
 {
 
     PhysicsObject pelaaja;
-    private int pelaajanMassa = 1000;
+    private int pelaajanMassa = 1;
     private int pelaajanLeveys = 70;
     private int pelaajanKorkeus = 140;
     private int kameranNopeus = 10;
     const int TAHDEN_LEVEYS = 40;
     const int TAHDEN_KORKEUS = 40;
-    const int LIIKUTUS_VEKTORI = 50;
+    const int LIIKUTUS_VEKTORI = 200;
 
     private IntMeter pelaajanPisteet;
     Timer aikaLaskuri = new Timer();
@@ -137,26 +137,7 @@ public class Leija : PhysicsGame
     }
 
 
-    /// <summary>
-    /// Aliohjelma, joka määrittelee pelaajan pelihahmon, sen ominaisuudet ja piirtää sen haluttuun paikkaan
-    /// </summary>
-    /// <param name="leveys">Pelihahmon leveys</param>
-    /// <param name="korkeus">Pelihahmon korkeus</param>
-    public void LisaaPelaaja(double leveys, double korkeus)
-    {
-        Vector pelaajanPaikkaAlussa = new Vector(Level.Left + 250, 50);
-        pelaaja = new PhysicsObject(leveys, korkeus);
-        pelaaja.Mass = 1000;
-        pelaaja.LinearDamping = 1;
-        pelaaja.Restitution = 0.0;
-        pelaaja.Position = pelaajanPaikkaAlussa;
-        pelaaja.Image = pelaajanKuva;
-        pelaaja.CanRotate = false;
-        AddCollisionHandler(pelaaja, "maa", TormaaKuolettavaan);
 
-        Add(pelaaja);
-
-    }
 
 
     /// <summary>
@@ -190,6 +171,50 @@ public class Leija : PhysicsGame
     }
 
 
+    /// <summary>
+    /// Aliohjelma määrittelee pelikentän ja asettaa sille reunat
+    /// </summary>
+    public void LuoKentta()
+    {
+        double[] korkeus = { 3, 3 };
+
+        Level.Width = 20000;
+        Level.Height = 1080;
+        Level.CreateBorders();
+
+        Gravity = new Vector(0, -100);
+
+        PhysicsObject maanpinta = Level.CreateGround(korkeus, 30);
+        maanpinta.Color = Color.Green;
+        maanpinta.Tag = "maa";
+        //Level.Background.MovesWithCamera = true;
+        Level.Background.Image = taustaKuva;
+        Level.Background.TileToLevel();
+
+        LuoPelaaja(pelaajanLeveys, pelaajanKorkeus);
+
+
+    }
+
+
+    /// <summary>
+    /// Aliohjelma, joka määrittelee pelaajan pelihahmon, sen ominaisuudet ja piirtää sen haluttuun paikkaan
+    /// </summary>
+    /// <param name="leveys">Pelihahmon leveys</param>
+    /// <param name="korkeus">Pelihahmon korkeus</param>
+    public void LuoPelaaja(double leveys, double korkeus)
+    {
+        Vector pelaajanPaikkaAlussa = new Vector(Level.Left + 250, 50);
+        pelaaja = new PhysicsObject(leveys, korkeus);
+        pelaaja.Mass = 1;
+        pelaaja.Position = pelaajanPaikkaAlussa;
+        pelaaja.Image = pelaajanKuva;
+        pelaaja.CanRotate = false;
+        AddCollisionHandler(pelaaja, "maa", TormaaKuolettavaan);
+
+        Add(pelaaja);
+
+    }
 
     /// <summary>
     /// Määritellään kerättävä tähti
@@ -216,30 +241,7 @@ public class Leija : PhysicsGame
 
 
 
-    /// <summary>
-    /// Aliohjelma määrittelee pelikentän ja asettaa sille reunat
-    /// </summary>
-    public void LuoKentta()
-    {
-        double[] korkeus = { 3, 3 };
 
-        Level.Width = 20000;
-        Level.Height = 1080;
-        Level.CreateBorders();
-
-        Gravity = new Vector(0, -100);
-
-        PhysicsObject maanpinta = Level.CreateGround(korkeus, 30);
-        maanpinta.Color = Color.Green;
-        maanpinta.Tag = "maa";
-        //Level.Background.MovesWithCamera = true;
-        Level.Background.Image = taustaKuva;
-        Level.Background.TileToLevel();
-        
-        LisaaPelaaja(pelaajanLeveys, pelaajanKorkeus);
-
-
-    }
 
 
     /// <summary>
