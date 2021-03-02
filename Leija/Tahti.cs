@@ -15,6 +15,7 @@ public class Tahti : PhysicsObject
     public void TuhoaTahti()
     {
         this.Destroy();
+
     }
 
 }
