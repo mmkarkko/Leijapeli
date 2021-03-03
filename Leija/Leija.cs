@@ -19,10 +19,11 @@ using System.Collections.Generic;
 /// </summary>
 public class Leija : PhysicsGame
 {
-    private int pelaajanMassa = 1;
     private int pelaajanLeveys = 70;
     private int pelaajanKorkeus = 140;
-    private int kameranNopeus = 10;
+    private int kameranNopeus = 100;
+    const int KENTAN_LEVEYS = 10000;
+    const int KENTAN_KORKEUS = 1080;
     const int TAHDEN_LEVEYS = 40;
     const int TAHDEN_KORKEUS = 40;
     const int LIIKUTUS_VEKTORI = 200;
@@ -31,27 +32,34 @@ public class Leija : PhysicsGame
 
     private IntMeter pelaajanPisteet;  
 
+
     /// <summary>
-    /// Pääohjelma suorittaa pelin aloituksen ja luo hahmot ym
+    /// Pääohjelma suorittaa pelin aloituksen
     /// </summary>
     public override void Begin()
     {
         PhysicsObject pelaaja = LuoKentta();
         SetWindowSize(1920, 1080);
-        LiikutaKenttaa(pelaaja);
+        LiikutaKenttaa(kameranNopeus);
         Myrskypilvi();
         LuoTahti();
         LisaaNappaimet(pelaaja);
-        LisaaPisteLaskuri();
+        pelaajanPisteet = LuoPisteLaskuri(Screen.Left + 100, Screen.Bottom + 100);
 
-        Timer liikutusAjastin = new Timer();
-        liikutusAjastin.Interval = 0.01;
-        liikutusAjastin.Timeout += delegate () 
-        { 
-            SiirraPelaajaaOikealle(pelaaja); 
-        };
-        liikutusAjastin.Start();
-        
+        //Timer ajastin = new Timer();
+        //int kameranNopeusX = 100;
+        //ajastin.Interval = 2;
+        //ajastin.Timeout += delegate () { LiikutaKenttaa(kameranNopeusX); };
+        //ajastin.Start();
+
+        //Timer liikutusAjastin = new Timer();
+        //liikutusAjastin.Interval = 0.01;
+        //liikutusAjastin.Timeout += delegate () 
+        //{ 
+        //    //SiirraPelaajaaOikealle(pelaaja); 
+        //};
+        //liikutusAjastin.Start();
+
         AddCollisionHandler<PhysicsObject, Tahti>(pelaaja, TormaaTahteen);
         AddCollisionHandler<PhysicsObject, Pilvi>(pelaaja, TormaaPilveen);
         AddCollisionHandler(pelaaja, "puu", TormaaKuolettavaan);
@@ -63,13 +71,16 @@ public class Leija : PhysicsGame
     /// Liikuttaa kameraa eteenpäin
     /// </summary>
     /// <param name="pelaaja">Pelihahmo, jolla pelataan</param>
-    public void LiikutaKenttaa(PhysicsObject pelaaja)
-    { 
+    public void LiikutaKenttaa(int kameranNopeusX)
+    {
+        //Timer ajastin = new Timer();
+        //kameranNopeusX = 100;
+        
+
+        // Kameran liikkumisnopeus kiihtymään
         Camera.X = Level.Left + 100;
-
-        Camera.Velocity = new Vector(150, 0);
-        pelaaja.Push(new Vector(kameranNopeus, 0.0));
-
+        Camera.Velocity = new Vector(kameranNopeusX, 0);
+    
     }
 
 
@@ -102,24 +113,26 @@ public class Leija : PhysicsGame
     }
 
 
-    /// <summary>
-    /// Yhdistää pelaajan pisteet pistelaskuriin, sekä määrittelee sen paikan
-    /// </summary>
-    public void LisaaPisteLaskuri()
-    {
-        pelaajanPisteet = LuoPisteLaskuri(Screen.Left + 100, Screen.Bottom + 100);
+    ///// <summary>
+    ///// Yhdistää pelaajan pisteet pistelaskuriin, sekä määrittelee sen paikan
+    ///// </summary>
+    //public void LisaaPisteLaskuri()
+    //{
+    //    //pelaajanPisteet = LuoPisteLaskuri(Screen.Left + 100, Screen.Bottom + 100);
 
-    }
+    //}
 
     /// <summary>
     /// Lisää peliin puita
     /// </summary>
     public void LisaaPuu()
     {
-        for (int i = 0; i < 30; i++)
+        for (int i = 0; i < 50; i++)
         {
-            PhysicsObject puu = new PhysicsObject(200, 500);
-            puu.X = RandomGen.NextInt(-9000, 9000);
+            int x = RandomGen.NextInt(-KENTAN_LEVEYS, KENTAN_LEVEYS);
+            int puunLeveys = RandomGen.NextInt(50, 250);
+            PhysicsObject puu = new PhysicsObject(puunLeveys, 2.5 * puunLeveys);
+            puu.X = x;
             puu.Bottom = Level.Bottom;
             puu.IgnoresGravity = true;
             puu.CanRotate = false;
@@ -140,8 +153,8 @@ public class Leija : PhysicsGame
     {
         double[] korkeus = { 3, 3 };
 
-        Level.Width = 20000;
-        Level.Height = 1080;
+        Level.Width = KENTAN_LEVEYS;
+        Level.Height = KENTAN_KORKEUS;
         Level.CreateBorders();
 
         LisaaPuu();
@@ -208,12 +221,13 @@ public class Leija : PhysicsGame
     /// </summary>
     public void LuoTahti()
     {
-        for (int i = 0; i <= 20; i++)
+        for (int i = 0; i <= 100; i++)
         {
+            int x = RandomGen.NextInt(-KENTAN_LEVEYS / 2, KENTAN_LEVEYS / 2);
+            int y = RandomGen.NextInt(0, 500);
             Tahti tahti = new Tahti(TAHDEN_LEVEYS, TAHDEN_KORKEUS);
             tahti.Image = LoadImage("tahdenKuva");
-            tahti.Mass = pelaajanMassa / 100;
-            tahti.Position = RandomGen.NextVector(Level.BoundingRect);
+            tahti.Position = new Vector(x, y);
             tahti.IgnoresCollisionResponse = true;
             tahti.IgnoresPhysicsLogics = true;
             tahti.IgnoresGravity = true;
@@ -230,10 +244,12 @@ public class Leija : PhysicsGame
     /// </summary>
     public void Myrskypilvi()
     {
-        for (int i = 0; i < 7; i++)
+        for (int i = 0; i < 10; i++)
         {
+            int x = RandomGen.NextInt(-KENTAN_LEVEYS / 2, KENTAN_LEVEYS / 2);
+            int y = RandomGen.NextInt(0, KENTAN_KORKEUS / 2);
             Pilvi pilvi = new Pilvi(PILVEN_LEVEYS, PILVEN_KORKEUS);
-            pilvi.Position = RandomGen.NextVector(Level.BoundingRect);
+            pilvi.Position = new Vector(x, y);
             pilvi.IgnoresGravity = true;
             pilvi.CanRotate = false;
             pilvi.Image = LoadImage ("myrskypilvi400korkea");
@@ -246,10 +262,10 @@ public class Leija : PhysicsGame
     }
 
 
-    public void SiirraPelaajaaOikealle(PhysicsObject pelaaja)
-    {
-        pelaaja.Push(new Vector(kameranNopeus, 0));
-    }
+    //public void SiirraPelaajaaOikealle(PhysicsObject pelaaja)
+    //{
+    //    pelaaja.Push(new Vector(kameranNopeus, 0));
+    //}
 
 
     /// <summary>
