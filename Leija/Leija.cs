@@ -31,16 +31,6 @@ public class Leija : PhysicsGame
 
     private IntMeter pelaajanPisteet;  
 
-    Image taustaKuva = LoadImage("leijaTaustakuva.jpg");
-    Image pelaajanKuva = LoadImage("leija240korkea.png");
-    Image pelaajaKuoliKuva = LoadImage("leija240korkeaKuoli.png");
-    Image myrskypilvi = LoadImage("myrskypilvi400korkea.png");
-    Image puunKuva = LoadImage("puu400korkea.png");
-    Image tahdenKuva = LoadImage("tahdenKuva.png");
-    SoundEffect ukkosenAani = LoadSoundEffect("ukkosenJyrina.wav");
-    SoundEffect keraaTahtiAani = LoadSoundEffect("keraaTahtiAani.wav");
-
-
     /// <summary>
     /// Pääohjelma suorittaa pelin aloituksen ja luo hahmot ym
     /// </summary>
@@ -62,7 +52,6 @@ public class Leija : PhysicsGame
         };
         liikutusAjastin.Start();
         
-
         AddCollisionHandler<PhysicsObject, Tahti>(pelaaja, TormaaTahteen);
         AddCollisionHandler<PhysicsObject, Pilvi>(pelaaja, TormaaPilveen);
         AddCollisionHandler(pelaaja, "puu", TormaaKuolettavaan);
@@ -134,7 +123,7 @@ public class Leija : PhysicsGame
             puu.Bottom = Level.Bottom;
             puu.IgnoresGravity = true;
             puu.CanRotate = false;
-            puu.Image = puunKuva;
+            puu.Image = LoadImage("puu400korkea");
             puu.IgnoresCollisionResponse = true;
             puu.Tag = "puu";
             Add(puu);
@@ -163,7 +152,7 @@ public class Leija : PhysicsGame
         maanpinta.Color = Color.Green;
         maanpinta.Tag = "maa";
         //Level.Background.MovesWithCamera = true;
-        Level.Background.Image = taustaKuva;
+        Level.Background.Image = LoadImage("leijaTaustaKuva");
         Level.Background.TileToLevel();
 
         PhysicsObject pelaaja = LuoPelaaja(pelaajanLeveys, pelaajanKorkeus);
@@ -183,7 +172,7 @@ public class Leija : PhysicsGame
         PhysicsObject pelaaja = new PhysicsObject(leveys, korkeus);
         pelaaja.Mass = 1;
         pelaaja.Position = pelaajanPaikkaAlussa;
-        pelaaja.Image = pelaajanKuva;
+        pelaaja.Image = LoadImage ("leija240korkea");
         pelaaja.CanRotate = false;
         AddCollisionHandler(pelaaja, "maa", TormaaKuolettavaan);
 
@@ -222,7 +211,7 @@ public class Leija : PhysicsGame
         for (int i = 0; i <= 20; i++)
         {
             Tahti tahti = new Tahti(TAHDEN_LEVEYS, TAHDEN_KORKEUS);
-            tahti.Image = tahdenKuva;
+            tahti.Image = LoadImage("tahdenKuva");
             tahti.Mass = pelaajanMassa / 100;
             tahti.Position = RandomGen.NextVector(Level.BoundingRect);
             tahti.IgnoresCollisionResponse = true;
@@ -247,7 +236,7 @@ public class Leija : PhysicsGame
             pilvi.Position = RandomGen.NextVector(Level.BoundingRect);
             pilvi.IgnoresGravity = true;
             pilvi.CanRotate = false;
-            pilvi.Image = myrskypilvi;
+            pilvi.Image = LoadImage ("myrskypilvi400korkea");
             pilvi.Tag = "pilvi";
             pilvi.IgnoresCollisionResponse = true;
             Add(pilvi);
@@ -278,7 +267,7 @@ public class Leija : PhysicsGame
         Keyboard.Disable(Key.Down);
         MessageDisplay.Add("Kuolit, peli loppui!");
         MessageDisplay.Add("Keräsit " + pelaajanPisteet.ToString() + " pistettä.");
-        pelaaja.Image = pelaajaKuoliKuva;
+        pelaaja.Image = LoadImage ("leija240korkeaKuoli");
 
     }
 
@@ -297,8 +286,9 @@ public class Leija : PhysicsGame
         Keyboard.Disable(Key.Up);
         Keyboard.Disable(Key.Down);
         MessageDisplay.Add("Kuolit, peli loppui!");
+        SoundEffect ukkosenAani = LoadSoundEffect("ukkosenJyrina.wav");
         ukkosenAani.Play();
-        pelaaja.Image = pelaajaKuoliKuva;
+        pelaaja.Image = LoadImage("leija240korkeaKuoli");
 
     }
 
@@ -312,6 +302,7 @@ public class Leija : PhysicsGame
         tahti.TuhoaTahti();
         pelaajanPisteet.AddValue(1);
         MessageDisplay.Add("Keräsit tähden");
+        SoundEffect keraaTahtiAani = LoadSoundEffect("keraaTahtiAani.wav");
         keraaTahtiAani.Play();
         
     }
