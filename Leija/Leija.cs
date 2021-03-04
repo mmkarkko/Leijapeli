@@ -45,20 +45,18 @@ public class Leija : PhysicsGame
         LuoTahti();
         LisaaNappaimet(pelaaja);
         pelaajanPisteet = LuoPisteLaskuri(Screen.Left + 100, Screen.Bottom + 100);
+        Camera.X = Level.Left + 100;
 
         //Timer ajastin = new Timer();
         //int kameranNopeusX = 100;
         //ajastin.Interval = 2;
-        //ajastin.Timeout += delegate () { LiikutaKenttaa(kameranNopeusX); };
-        //ajastin.Start();
+        //ajastin.Timeout += delegate () 
+        //{
+            
+        //    kameranNopeus += 500;
+        //    LiikutaKenttaa(kameranNopeusX); 
+        //}; ajastin.Start();
 
-        //Timer liikutusAjastin = new Timer();
-        //liikutusAjastin.Interval = 0.01;
-        //liikutusAjastin.Timeout += delegate () 
-        //{ 
-        //    //SiirraPelaajaaOikealle(pelaaja); 
-        //};
-        //liikutusAjastin.Start();
 
         AddCollisionHandler<PhysicsObject, Tahti>(pelaaja, TormaaTahteen);
         AddCollisionHandler<PhysicsObject, Pilvi>(pelaaja, TormaaPilveen);
@@ -73,14 +71,11 @@ public class Leija : PhysicsGame
     /// <param name="pelaaja">Pelihahmo, jolla pelataan</param>
     public void LiikutaKenttaa(int kameranNopeusX)
     {
-        //Timer ajastin = new Timer();
-        //kameranNopeusX = 100;
+        // Kameran liikkumisnopeus kiihtymään
         
 
-        // Kameran liikkumisnopeus kiihtymään
-        Camera.X = Level.Left + 100;
         Camera.Velocity = new Vector(kameranNopeusX, 0);
-    
+
     }
 
 
@@ -89,7 +84,7 @@ public class Leija : PhysicsGame
     /// </summary>
     /// <param name="pelaaja">Pelihahmo, jolla pelataan</param>
     /// <param name="vektori">Suunta, johon liikutaan</param>
-    public void LiikutaPelaajaa(PhysicsObject pelaaja, Vector vektori)
+    public void LiikutaPelaajaaNappaimilla(PhysicsObject pelaaja, Vector vektori)
     {  
         pelaaja.Push(vektori);
 
@@ -102,10 +97,10 @@ public class Leija : PhysicsGame
     /// <param name="pelaaja">Pelihahmo, jolla pelataan</param>
     public void LisaaNappaimet(PhysicsObject pelaaja)
     {
-        Keyboard.Listen(Key.Left, ButtonState.Down, LiikutaPelaajaa, "Liikuta pelaajaa vasemmalle", pelaaja, new Vector(-LIIKUTUS_VEKTORI, 0));
-        Keyboard.Listen(Key.Right, ButtonState.Down, LiikutaPelaajaa, "Liikuta pelaajaa oikealle", pelaaja, new Vector(LIIKUTUS_VEKTORI, 0));
-        Keyboard.Listen(Key.Up, ButtonState.Down, LiikutaPelaajaa, "Liikuta pelaajaa ylös", pelaaja, new Vector(0, LIIKUTUS_VEKTORI));
-        Keyboard.Listen(Key.Down, ButtonState.Down, LiikutaPelaajaa, "Liikuta pelaajaa alas", pelaaja, new Vector(0, -LIIKUTUS_VEKTORI));
+        Keyboard.Listen(Key.Left, ButtonState.Down, LiikutaPelaajaaNappaimilla, "Liikuta pelaajaa vasemmalle", pelaaja, new Vector(-LIIKUTUS_VEKTORI, 0));
+        Keyboard.Listen(Key.Right, ButtonState.Down, LiikutaPelaajaaNappaimilla, "Liikuta pelaajaa oikealle", pelaaja, new Vector(LIIKUTUS_VEKTORI, 0));
+        Keyboard.Listen(Key.Up, ButtonState.Down, LiikutaPelaajaaNappaimilla, "Liikuta pelaajaa ylös", pelaaja, new Vector(0, LIIKUTUS_VEKTORI));
+        Keyboard.Listen(Key.Down, ButtonState.Down, LiikutaPelaajaaNappaimilla, "Liikuta pelaajaa alas", pelaaja, new Vector(0, -LIIKUTUS_VEKTORI));
 
         PhoneBackButton.Listen(ConfirmExit, "Lopeta peli");
         Keyboard.Listen(Key.Escape, ButtonState.Pressed, ConfirmExit, "Lopeta peli");
@@ -189,7 +184,7 @@ public class Leija : PhysicsGame
         pelaaja.CanRotate = false;
         AddCollisionHandler(pelaaja, "maa", TormaaKuolettavaan);
 
-        Add(pelaaja);
+        Add(pelaaja, 1);
         return pelaaja;
     }
 
@@ -321,6 +316,15 @@ public class Leija : PhysicsGame
         SoundEffect keraaTahtiAani = LoadSoundEffect("keraaTahtiAani.wav");
         keraaTahtiAani.Play();
         
+    }
+
+
+    public double KuljettuMatka(Vector pelaajanPaikkaAlussa, Vector nykyinenSijainti)
+    {
+        double kuljettuMatka = Vector.Distance(pelaajanPaikkaAlussa, nykyinenSijainti);
+  
+
+        return kuljettuMatka;
     }
 
 }
