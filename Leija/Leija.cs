@@ -20,11 +20,8 @@ using System.Collections.Generic;
 public class Leija : PhysicsGame
 {
     Vector pelaajanPaikkaAlussa = new Vector(-4700, 50);
-    private int pelaajanLeveys = 70;
-    private int pelaajanKorkeus = 140;
     private int kameranNopeus = 80;
     const int KENTAN_LEVEYS = 10000;
-    const int KENTAN_KORKEUS = 1080;
     const int TAHDEN_LEVEYS = 40;
     const int TAHDEN_KORKEUS = 40;
     const int LIIKUTUS_VEKTORI = 200;
@@ -35,6 +32,8 @@ public class Leija : PhysicsGame
     private readonly Image pilvenKuva = LoadImage("myrskypilvi400korkea");
     private readonly Image puunKuva = LoadImage("puu400korkea");
     private readonly Image tahdenKuva = LoadImage("tahdenKuva");
+    private readonly SoundEffect ukkosenAani = LoadSoundEffect("ukkosenJyrina.wav");
+    private readonly SoundEffect keraaTahtiAani = LoadSoundEffect("keraaTahtiAani.wav");
 
     private IntMeter pelaajanPisteet;
     private bool peliKaynnissa = false;
@@ -46,46 +45,45 @@ public class Leija : PhysicsGame
     public override void Begin()
     {
         SetWindowSize(1920, 1080);
-
-        PhysicsObject pelaaja = LuoKentta();
-        LisaaPuu();
+        
+        PhysicsObject pelaaja = LuoPelaaja(70, 140);
+        LuoKentta(1080);
+        Camera.X = Level.Left + 100;
+        LisaaPuu(pelaaja.Position);
         Myrskypilvi(pelaaja.Position);
         LuoTahti();
-        
-        LiikutaKenttaa(kameranNopeus);
         LisaaNappaimet(pelaaja);
+        //LuoVihollinen(pelaaja.Position);
+        
         pelaajanPisteet = LuoPisteLaskuri(Screen.Left + 100, Screen.Bottom + 100);
-        Camera.X = Level.Left + 100;
+
 
         // Kameranliikutus ajastin, siirtää myös pelaajaa oikealle
         Timer liikutusAjastin = new Timer();
         liikutusAjastin.Interval = 0.5;
         liikutusAjastin.Timeout += KasvataKameranNopeutta;
-        liikutusAjastin.Timeout += delegate () 
+        liikutusAjastin.Timeout += delegate ()
         {
-            SiirraPelaajaaOikealle(pelaaja); 
+            SiirraPelaajaaOikealle(pelaaja);
         };
         liikutusAjastin.Start();
 
         AddCollisionHandler<PhysicsObject, Tahti>(pelaaja, TormaaTahteen);
-        AddCollisionHandler<PhysicsObject, Pilvi>(pelaaja, TormaaPilveen);
+        AddCollisionHandler(pelaaja, "pilvi", TormaaPilveen);
         AddCollisionHandler(pelaaja, "vihollinen", TormaaKuolettavaan);
 
         peliKaynnissa = true;
-
-        if (!peliKaynnissa) liikutusAjastin.Stop();
 
     }
 
 
     /// <summary>
-    /// Liikuttaa pelaajaa kameran mukana
+    /// Liikuttaa pelaajaa kameran mukana, jotta pelaaja ei kameran liikkuessa nopeammin jäisi jälkeen
     /// </summary>
     /// <param name="pelaaja">Pelihahmo, jolla pelataan</param>
     public void SiirraPelaajaaOikealle(PhysicsObject pelaaja)
     {
-        pelaaja.Push(new Vector(kameranNopeus + 8, 0));
-
+        pelaaja.Push(new Vector(kameranNopeus + 8, 0));    
     }
 
 
@@ -94,9 +92,8 @@ public class Leija : PhysicsGame
     /// </summary>
     private void KasvataKameranNopeutta()
     {
-        kameranNopeus = kameranNopeus + 3;
+        kameranNopeus += 3;
         LiikutaKenttaa(kameranNopeus);
-
     }
 
 
@@ -107,7 +104,6 @@ public class Leija : PhysicsGame
     public void LiikutaKenttaa(int kameranNopeusX)
     {
         Camera.Velocity = new Vector(kameranNopeusX, 0);
-
     }
 
 
@@ -119,7 +115,6 @@ public class Leija : PhysicsGame
     public void LiikutaPelaajaaNappaimilla(PhysicsObject pelaaja, Vector vektori)
     {  
         pelaaja.Push(vektori);
-
     }
     
 
@@ -133,38 +128,35 @@ public class Leija : PhysicsGame
         Keyboard.Listen(Key.Right, ButtonState.Down, LiikutaPelaajaaNappaimilla, "Liikuta pelaajaa oikealle", pelaaja, new Vector(LIIKUTUS_VEKTORI, 0));
         Keyboard.Listen(Key.Up, ButtonState.Down, LiikutaPelaajaaNappaimilla, "Liikuta pelaajaa ylös", pelaaja, new Vector(0, LIIKUTUS_VEKTORI));
         Keyboard.Listen(Key.Down, ButtonState.Down, LiikutaPelaajaaNappaimilla, "Liikuta pelaajaa alas", pelaaja, new Vector(0, -LIIKUTUS_VEKTORI));
-
         PhoneBackButton.Listen(ConfirmExit, "Lopeta peli");
         Keyboard.Listen(Key.Escape, ButtonState.Pressed, ConfirmExit, "Lopeta peli");
     }
 
 
-    ///// <summary>
-    ///// Yhdistää pelaajan pisteet pistelaskuriin, sekä määrittelee sen paikan
-    ///// </summary>
-    //public void LisaaPisteLaskuri()
-    //{
-    //    //pelaajanPisteet = LuoPisteLaskuri(Screen.Left + 100, Screen.Bottom + 100);
-
-    //}
-
     /// <summary>
     /// Lisää peliin puita
     /// </summary>
-    public void LisaaPuu()
+    public void LisaaPuu(Vector pelaajanSijainti)
     {
         for (int i = 0; i < 50; i++)
         {
-            double x = RandomGen.NextDouble(Level.Left, Level.Right);
             double puunLeveys = RandomGen.NextInt(50, 250);
             PhysicsObject puu = new PhysicsObject(puunLeveys, 2.5 * puunLeveys);
-            puu.X = x;
+            puu.Y = Level.Bottom;
             puu.Bottom = Level.Bottom;
             puu.IgnoresGravity = true;
             puu.CanRotate = false;
             puu.Image = puunKuva;
             puu.IgnoresCollisionResponse = true;
             puu.Tag = "vihollinen";
+
+            // Arvotaan puun x niin, ettei se tule liian lähelle pelaajaa
+            Vector puunSijainti;
+            do
+            {
+                puunSijainti = new Vector(RandomGen.NextDouble(Level.Left, Level.Right), puu.Y);
+            } while (Vector.Distance(puunSijainti, pelaajanSijainti) < VAROETAISYYS -100);
+            puu.Position = puunSijainti;
             Add(puu);
         }
     }
@@ -173,23 +165,18 @@ public class Leija : PhysicsGame
     /// <summary>
     /// Aliohjelma määrittelee pelikentän ja asettaa sille reunat
     /// </summary>
-    public PhysicsObject LuoKentta()
+    public void LuoKentta(int kentanKorkeus)
     {
         double[] korkeus = { 3, 3 };
-        PhysicsObject pelaaja = LuoPelaaja(pelaajanLeveys, pelaajanKorkeus);
-
         Level.Width = KENTAN_LEVEYS;
-        Level.Height = KENTAN_KORKEUS;
+        Level.Height = kentanKorkeus;
         Level.CreateBorders();
-
         Gravity = new Vector(0, -80);
-
         PhysicsObject maanpinta = Level.CreateGround(korkeus, 30);
         maanpinta.Color = Color.Green;
         maanpinta.Tag = "vihollinen";
         Level.Background.Image = LoadImage("leijaTaustaKuva");
         Level.Background.TileToLevel();    
-        return pelaaja;
     }
 
 
@@ -216,7 +203,7 @@ public class Leija : PhysicsGame
     /// <param name="x">Pistelaskurin sijainti x-akselilla</param>
     /// <param name="y">Pistelaskurin sijainti y-akselilla</param>
     /// <returns>Pistelaskuri</returns>
-    IntMeter LuoPisteLaskuri(double x, double y)
+    public IntMeter LuoPisteLaskuri(double x, double y)
     {
         IntMeter laskuri = new IntMeter(0);
         Label pisteNaytto = new Label(100, 100);
@@ -251,6 +238,12 @@ public class Leija : PhysicsGame
         }
     }
 
+    //public void LuoVihollinen(Vector pelaajanSijainti, int montakoLuodaan)
+    //{
+
+
+    //}
+
 
     /// <summary>
     /// Aliohjelma määrittelee peliin myrskypilven ja sen ominaisuudet
@@ -259,33 +252,25 @@ public class Leija : PhysicsGame
     {
         for (int i = 0; i < 10; i++)
         {
-            //int x = RandomGen.NextInt(-KENTAN_LEVEYS / 2, KENTAN_LEVEYS / 2);
-            //int y = RandomGen.NextInt(0, KENTAN_KORKEUS / 2);
-            Pilvi pilvi = new Pilvi(PILVEN_LEVEYS, PILVEN_KORKEUS);
+            int y = RandomGen.NextInt(0, 1080 / 2);
+            PhysicsObject pilvi = new PhysicsObject(PILVEN_LEVEYS, PILVEN_KORKEUS);
             //pilvi.Position = new Vector(x, y);
             pilvi.IgnoresGravity = true;
             pilvi.CanRotate = false;
             pilvi.Image = pilvenKuva;
-            pilvi.Tag = "vihollinen";
+            pilvi.Tag = "pilvi";
             pilvi.IgnoresCollisionResponse = true;
-           
+
             // Katsotaan, ettei pilvi tule liian lähelle pelaajaa
             Vector pilvenSijainti;
             do
             {
-                pilvenSijainti = RandomGen.NextVector(Level.BoundingRect);
+                pilvenSijainti = new Vector(RandomGen.NextDouble(Level.Left, Level.Right), y);
             } while (Vector.Distance(pilvenSijainti, pelaajanSijainti) < VAROETAISYYS);
-
             pilvi.Position = pilvenSijainti;
             Add(pilvi);
         }
     }
-
-
-    //public void SiirraPelaajaaOikealle(PhysicsObject pelaaja)
-    //{
-    //    pelaaja.Push(new Vector(kameranNopeus, 0));
-    //}
 
 
     /// <summary>
@@ -306,8 +291,7 @@ public class Leija : PhysicsGame
             MessageDisplay.Add("Kuolit, peli loppui!");
             MessageDisplay.Add("Keräsit " + pelaajanPisteet.ToString() + " pistettä.");
             pelaaja.Image = LoadImage("leija240korkeaKuoli");
-
-            peliKaynnissa = false;
+            peliKaynnissa = false;       
         }
     }
 
@@ -325,12 +309,12 @@ public class Leija : PhysicsGame
             Keyboard.Disable(Key.Left);
             Keyboard.Disable(Key.Right);
             Keyboard.Disable(Key.Up);
-            Keyboard.Disable(Key.Down);
-            //MessageDisplay.Add("Keräsit " + pelaajanPisteet.ToString() + " pistettä.");
-            SoundEffect ukkosenAani = LoadSoundEffect("ukkosenJyrina.wav");
+            Keyboard.Disable(Key.Down);  
             ukkosenAani.Play();
             pelaaja.Image = LoadImage("leija240korkeaKuoli");
-            MessageDisplay.Add("Keräsit " + KokonaisPisteet(pelaaja) + " pistettä.");
+            MessageDisplay.Add("Kuljettu matka " + KuljettuMatka(pelaaja.Position));
+            MessageDisplay.Add("Keräsit tähtiä " + pelaajanPisteet +  " ja  sait yhteensä " + KokonaisPisteet(pelaaja.Position) + " pistettä.");
+            ukkosenAani.Play();
             peliKaynnissa = false;
         }
     }
@@ -347,7 +331,6 @@ public class Leija : PhysicsGame
             tahti.TuhoaTahti();
             pelaajanPisteet.AddValue(1);
             MessageDisplay.Add("Keräsit tähden");
-            SoundEffect keraaTahtiAani = LoadSoundEffect("keraaTahtiAani.wav");
             keraaTahtiAani.Play();
         }
     }
@@ -358,11 +341,11 @@ public class Leija : PhysicsGame
     /// </summary>
     /// <param name="pelaaja">Pelaaja, jolla pelataan</param>
     /// <returns>Pelin kokonaispisteet</returns>
-    public double KokonaisPisteet(PhysicsObject pelaaja)
+    public double KokonaisPisteet(Vector pelaajanSijaintiKuollessa)
     {
-        double kuljettuMatka = Vector.Distance(pelaajanPaikkaAlussa, pelaaja.Position);
+        double kuljettuMatka = Vector.Distance(pelaajanPaikkaAlussa, pelaajanSijaintiKuollessa);
         double kokonaisPisteet;
-        
+      
         // Jokaisesta kuljetusta 500:sta saa pisteitä 50
         // Tutkitaan tässä, kuinka monta 500:n pätkää on kuljettu ja kerrotaan kertoimella
         // Lisätään siihen kerätyistä tähdistä saadut pisteet
@@ -371,15 +354,21 @@ public class Leija : PhysicsGame
         int kerroin = 0;
         while (i < kuljettuMatka)
         {
-            if (i % 500 == 0)
+            if (i % 1000 == 0)
             {
                 kerroin++;
+                
             }
             i++;
         }
-        kokonaisPisteet = pelaajanPisteet + kerroin * 50;
-        Convert.ToInt32(kokonaisPisteet);
+        kokonaisPisteet = pelaajanPisteet + kerroin * 10;
         return kokonaisPisteet;
+    }
+
+    public double KuljettuMatka(Vector pelaajanPaikkaKuollessa)
+    {
+        double kuljettuMatka = Vector.Distance(pelaajanPaikkaAlussa, pelaajanPaikkaKuollessa);
+        return kuljettuMatka;
     }
 }
 
