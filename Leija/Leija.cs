@@ -20,7 +20,7 @@ using System.Collections.Generic;
 public class Leija : PhysicsGame
 {
     Vector pelaajanPaikkaAlussa = new Vector(-4700, 50);
-    private int kameranNopeus = 80;
+    private int kameranNopeus = 200;
     const int KENTAN_LEVEYS = 10000;
     const int TAHDEN_LEVEYS = 40;
     const int TAHDEN_KORKEUS = 40;
@@ -37,7 +37,8 @@ public class Leija : PhysicsGame
 
     private IntMeter pelaajanPisteet;
     private bool peliKaynnissa = false;
-
+    Timer liikutusAjastin;
+    Timer kameranLiikutusAjastin;
 
     /// <summary>
     /// Aloittaa pelin
@@ -49,30 +50,35 @@ public class Leija : PhysicsGame
         PhysicsObject pelaaja = LuoPelaaja(70, 140);
         LuoKentta(1080);
         Camera.X = Level.Left + 100;
+        
         LisaaPuu(pelaaja.Position);
         Myrskypilvi(pelaaja.Position);
         LuoTahti();
         LisaaNappaimet(pelaaja);
         //LuoVihollinen(pelaaja.Position);
-        
+        //Camera.Follow(pelaaja);
         pelaajanPisteet = LuoPisteLaskuri(Screen.Left + 100, Screen.Bottom + 100);
-
+        peliKaynnissa = true;
 
         // Kameranliikutus ajastin, siirtää myös pelaajaa oikealle
-        Timer liikutusAjastin = new Timer();
+        liikutusAjastin = new Timer();
         liikutusAjastin.Interval = 0.5;
-        liikutusAjastin.Timeout += KasvataKameranNopeutta;
         liikutusAjastin.Timeout += delegate ()
         {
             SiirraPelaajaaOikealle(pelaaja);
         };
         liikutusAjastin.Start();
 
+        kameranLiikutusAjastin = new Timer();
+        kameranLiikutusAjastin.Interval = 0.5;
+        kameranLiikutusAjastin.Timeout += KasvataKameranNopeutta;
+        kameranLiikutusAjastin.Start();
+
         AddCollisionHandler<PhysicsObject, Tahti>(pelaaja, TormaaTahteen);
         AddCollisionHandler(pelaaja, "pilvi", TormaaPilveen);
         AddCollisionHandler(pelaaja, "vihollinen", TormaaKuolettavaan);
 
-        peliKaynnissa = true;
+        
 
     }
 
@@ -83,7 +89,7 @@ public class Leija : PhysicsGame
     /// <param name="pelaaja">Pelihahmo, jolla pelataan</param>
     public void SiirraPelaajaaOikealle(PhysicsObject pelaaja)
     {
-        pelaaja.Push(new Vector(kameranNopeus + 8, 0));    
+        if (peliKaynnissa) pelaaja.Push(new Vector(kameranNopeus + 8, 0));    
     }
 
 
@@ -92,18 +98,11 @@ public class Leija : PhysicsGame
     /// </summary>
     private void KasvataKameranNopeutta()
     {
-        kameranNopeus += 3;
-        LiikutaKenttaa(kameranNopeus);
-    }
-
-
-    /// <summary>
-    /// Liikuttaa kameraa eteenpäin
-    /// </summary>
-    /// <param name="pelaaja">Pelihahmo, jolla pelataan</param>
-    public void LiikutaKenttaa(int kameranNopeusX)
-    {
-        Camera.Velocity = new Vector(kameranNopeusX, 0);
+        if (peliKaynnissa)
+        {
+            kameranNopeus += 10;
+            Camera.Velocity = new Vector(kameranNopeus, 0);
+        }
     }
 
 
@@ -282,6 +281,11 @@ public class Leija : PhysicsGame
     {
         if (peliKaynnissa)
         {
+            liikutusAjastin.Stop();
+            kameranLiikutusAjastin.Stop();
+            Camera.Velocity = new Vector(0,0);
+            peliKaynnissa = false;
+            kameranNopeus = 0;
             Gravity = new Vector(0, -800);
             StopAll();
             Keyboard.Disable(Key.Left);
@@ -291,7 +295,8 @@ public class Leija : PhysicsGame
             MessageDisplay.Add("Kuolit, peli loppui!");
             MessageDisplay.Add("Keräsit " + pelaajanPisteet.ToString() + " pistettä.");
             pelaaja.Image = LoadImage("leija240korkeaKuoli");
-            peliKaynnissa = false;       
+
+                
         }
     }
 
