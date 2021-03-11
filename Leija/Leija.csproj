@@ -13,10 +13,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Content\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <None Update="Content\keraaTahtiAani.wav">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
@@ -35,10 +31,19 @@
       <None Update="Content\myrskypilvi400korkea.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="Content\oksanKatkeaminen.wav">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
       <None Update="Content\puu400korkea.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Content\tahdenKuva.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Content\taustamusiikki.wav">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Content\taustamusiikkiVaimea.wav">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Content\ukkosenJyrina.wav">
