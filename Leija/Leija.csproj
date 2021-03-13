@@ -28,6 +28,9 @@
       <None Update="Content\leijaTaustakuva.jpg">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="Content\maahanPutoaminen.wav">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
       <None Update="Content\myrskypilvi400korkea.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
