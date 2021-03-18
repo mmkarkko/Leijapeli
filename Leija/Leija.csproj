@@ -13,6 +13,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Update="Content\hymyTahti.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
       <None Update="Content\keraaTahtiAani.wav">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
