@@ -40,7 +40,7 @@
       <None Update="Content\oksanKatkeaminen.wav">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Content\puu400korkea.png">
+      <None Update="Content\puunKuva.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Content\tahdenKuva.png">

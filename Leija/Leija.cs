@@ -30,7 +30,7 @@ public class Leija : PhysicsGame
     Vector pelaajanPaikkaAlussa = new Vector(-KENTAN_LEVEYS / 2 -200, 50); // Tätä tarvitaan tosi monessa paikassa
 
     private readonly Image pilvenKuva = LoadImage("myrskypilvi400korkea");
-    private readonly Image puunKuva = LoadImage("puu400korkea");
+    private readonly Image puunKuva = LoadImage("puunKuva");
     private readonly Image tahdenKuva = LoadImage("hymyTahti");
     private readonly SoundEffect keraaTahtiAani = LoadSoundEffect("keraaTahtiAani.wav");
 
@@ -276,7 +276,7 @@ public class Leija : PhysicsGame
             pilvi.CanRotate = false;
             pilvi.Tag = "pilvi";
             pilvienSijainnit[i] = pilvi;
-            //Add(pilvi);
+            Add(pilvi);
         }
    }
 
