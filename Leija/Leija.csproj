@@ -16,13 +16,13 @@
       <None Update="Content\hymyTahti.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Content\keraaTahtiAani.wav">
+      <None Update="Content\kerattavaKerattiinAani.wav">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Content\leija240korkea.png">
+      <None Update="Content\leijanKuva.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Content\leija240korkeaKuoli.png">
+      <None Update="Content\leijaKuoli.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Content\leijaOsuuPuuhun.wav">
@@ -34,19 +34,13 @@
       <None Update="Content\maahanPutoaminen.wav">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Content\myrskypilvi400korkea.png">
+      <None Update="Content\myrskypilvi.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Content\oksanKatkeaminen.wav">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Content\puunKuva.png">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Content\tahdenKuva.png">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Content\taustamusiikki.wav">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Content\taustamusiikkiVaimea.wav">

@@ -12,32 +12,24 @@ using System.Collections.Generic;
 // kaikista tämän version eroavaisuuksista sekä tunnetuista ongelmista. Täydennä listaa tarvittaessa.
 
 ///@author Miia Arkko
-///@version 23.3.2021
+///@version 26.3.2021
 /// <summary>
 /// Peli, jossa lännetään leijalla, kerätään kerättäviä ja varotaan osumasta mihinkään muuhun.
 /// Peli päättyy, jos törmätään johonkin kuolettavaan tai jos pelaaja pääsee maaliin asti.
 /// </summary>
 public class Leija : PhysicsGame
 {
-    PhysicsObject[] pilvienSijainnit = new PhysicsObject[12];
-    PhysicsObject[] kerattavat = new PhysicsObject[130];
+    private readonly PhysicsObject[] pilvienSijainnit = new PhysicsObject[12];
+    private readonly PhysicsObject[] kerattavat = new PhysicsObject[130];  
     
     private int kameranNopeus = 200;
-    const int KENTAN_LEVEYS = 10000;
-    const int KENTAN_KORKEUS = 1080;
-    const int TAHDEN_KOKO = 50;
-    const int PILVEN_KOKO = 200;
-    Vector pelaajanPaikkaAlussa = new Vector(-KENTAN_LEVEYS / 2 -200, 50); // Tätä tarvitaan tosi monessa paikassa
-
-    private readonly Image pilvenKuva = LoadImage("myrskypilvi400korkea");
-    private readonly Image puunKuva = LoadImage("puunKuva");
-    private readonly Image tahdenKuva = LoadImage("hymyTahti");
-    private readonly SoundEffect keraaTahtiAani = LoadSoundEffect("keraaTahtiAani.wav");
-
+    const int KENTAN_PITUUS = 10800;
+    const int HAHMON_KOKO = 200;
+    
     private IntMeter pelaajanPisteet;
     private bool peliKaynnissa = false;
-    bool ekaPeliKerta = true;
-    Timer kameranLiikutusAjastin;
+    private bool ekaPeliKerta = true;
+    private Timer kameranLiikutusAjastin;
 
     /// <summary>
     /// Aloittaa pelin, lisää peliin taustamusiikin
@@ -46,7 +38,7 @@ public class Leija : PhysicsGame
     { 
         MediaPlayer.Play("taustamusiikkiVaimea.wav");
         MediaPlayer.IsRepeating = true;
-        SetWindowSize(1920, KENTAN_KORKEUS); 
+        SetWindowSize(1920, KENTAN_PITUUS/10); 
         LuoKentta();
         Camera.X = Level.Left + 100;
         peliKaynnissa = true;
@@ -93,7 +85,6 @@ public class Leija : PhysicsGame
     {
         double kuljettuMatka = KuljettuMatka(pelaajanSijaintiPelinLopussa);
         double kokonaisPisteet = 0;
-
         int i = 0;
         int piste = 5;
         int kerroin = 0;
@@ -121,6 +112,7 @@ public class Leija : PhysicsGame
     /// <returns>Pelin aikana kuljettu matka</returns>
     public double KuljettuMatka(Vector pelaajanSijaintiPelinLopussa)
     {
+        Vector pelaajanPaikkaAlussa = new Vector(-KENTAN_PITUUS / 2, KENTAN_PITUUS / 50);
         double kuljettuMatka = Vector.Distance(pelaajanPaikkaAlussa, pelaajanSijaintiPelinLopussa);
         kuljettuMatka = Convert.ToInt32(kuljettuMatka);
         return kuljettuMatka;
@@ -161,8 +153,8 @@ public class Leija : PhysicsGame
     public void LuoKentta()
     {
         double[] korkeus = { 3, 3 };
-        Level.Width = KENTAN_LEVEYS;
-        Level.Height = KENTAN_KORKEUS;
+        Level.Width = KENTAN_PITUUS;
+        Level.Height = KENTAN_PITUUS/10;
         Level.CreateLeftBorder();
         Gravity = new Vector(0, -50);
         PhysicsObject oikeaReuna = Level.CreateRightBorder();
@@ -177,6 +169,7 @@ public class Leija : PhysicsGame
         Level.Background.TileToLevel();
         
         PhysicsObject pelaaja = LuoPelaaja();
+        
         LuoKerattava();
         if (ekaPeliKerta) LuoPuu();
         if (ekaPeliKerta) LuoPilvi();
@@ -201,12 +194,13 @@ public class Leija : PhysicsGame
     /// Luo kentälle kerättävät tähdet
     /// </summary>
     public void LuoKerattava()
-    {
+    {   
+        Image tahdenKuva = LoadImage("hymyTahti");
         for (int i = 0; i < kerattavat.Length; i++)
         {
-            int x = RandomGen.NextInt(-KENTAN_LEVEYS / 2, KENTAN_LEVEYS / 2);
+            int x = RandomGen.NextInt(-KENTAN_PITUUS / 2, KENTAN_PITUUS / 2);
             int y = RandomGen.NextInt(60, 500);
-            PhysicsObject tahti = new PhysicsObject(TAHDEN_KOKO, TAHDEN_KOKO);
+            PhysicsObject tahti = new PhysicsObject(HAHMON_KOKO / 4, HAHMON_KOKO /4);
             tahti.Image = tahdenKuva;
             tahti.Tag = "tahti";
             tahti.Position = new Vector(x, y);
@@ -248,8 +242,9 @@ public class Leija : PhysicsGame
     {
         PhysicsObject pelaaja = new PhysicsObject(70, 140);
         pelaaja.Mass = 0.5;
-        pelaaja.Position = pelaajanPaikkaAlussa;
-        pelaaja.Image = LoadImage("leija240korkea");
+        pelaaja.X = -KENTAN_PITUUS / 2;
+        pelaaja.Y = KENTAN_PITUUS / 50;
+        pelaaja.Image = LoadImage("leijanKuva");
         pelaaja.CanRotate = false;
         Add(pelaaja, 1);
         return pelaaja;
@@ -261,11 +256,12 @@ public class Leija : PhysicsGame
     /// </summary>
     public void LuoPilvi()
     {
+        Image pilvenKuva = LoadImage("myrskypilvi");
         double pilvenX;
-        double luku = KENTAN_LEVEYS / pilvienSijainnit.Length;
+        double luku = KENTAN_PITUUS / pilvienSijainnit.Length;
         for (int i = 0; i < pilvienSijainnit.Length; i++)
         {
-            PhysicsObject pilvi = new PhysicsObject(PILVEN_KOKO, PILVEN_KOKO + 50);
+            PhysicsObject pilvi = new PhysicsObject(HAHMON_KOKO, HAHMON_KOKO + 50);
             if (i < 1)  pilvenX = Level.Left + luku;
             else pilvenX = pilvienSijainnit[i - 1].X + luku;
             pilvi.Y = RandomGen.NextDouble(0, Level.Top - 50);
@@ -285,7 +281,8 @@ public class Leija : PhysicsGame
     /// Luo peliin puu-viholliset
     /// </summary>
     public void LuoPuu()
-    {
+    {   
+        Image puunKuva = LoadImage("puunKuva");
         double varoetaisyys = 600;
         for (int i = 0; i < 75; i++)
         {
@@ -318,7 +315,7 @@ public class Leija : PhysicsGame
     /// <param name="kohde">Kohde, johon pelaaja on törmännyt</param>
     public void PeliLoppui(PhysicsObject pelaaja, PhysicsObject kohde)
     {
-        Image pelaajaKuoli = LoadImage("leija240korkeaKuoli");
+        Image pelaajaKuoli = LoadImage("leijaKuoli");
 
         foreach (PhysicsObject kerattava in kerattavat)
         {
@@ -364,6 +361,7 @@ public class Leija : PhysicsGame
     /// <param name="kerattava">Kerättävä, johon törmätään</param>
     public void TormaaKerattavaan(PhysicsObject pelaaja, PhysicsObject kerattava)
     {
+        SoundEffect keraaTahtiAani = LoadSoundEffect("kerattavaKerattiinAani.wav");
         if (peliKaynnissa)
         {
             kerattava.Destroy();
