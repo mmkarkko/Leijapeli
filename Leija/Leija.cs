@@ -110,7 +110,7 @@ public class Leija : PhysicsGame
     /// </summary>
     /// <param name="pelaajanSijaintiPelinLopussa">Sijainti, jossa pelaaja oli pelin päättyessä</param>
     /// <returns>Pelin aikana kuljettu matka</returns>
-    public double KuljettuMatka(Vector pelaajanSijaintiPelinLopussa)
+    public static double KuljettuMatka(Vector pelaajanSijaintiPelinLopussa)
     {
         Vector pelaajanPaikkaAlussa = new Vector(-KENTAN_PITUUS / 2, KENTAN_PITUUS / 50);
         double kuljettuMatka = Vector.Distance(pelaajanPaikkaAlussa, pelaajanSijaintiPelinLopussa);
@@ -124,7 +124,7 @@ public class Leija : PhysicsGame
     /// </summary>
     /// <param name="pelaaja">Pelihahmo, jolla pelataan</param>
     /// <param name="vektori">Suunta, johon liikutaan</param>
-    public void LiikutaPelaajaaNappaimilla(PhysicsObject pelaaja, Vector vektori)
+    public static void LiikutaPelaajaaNappaimilla(PhysicsObject pelaaja, Vector vektori)
     {
         pelaaja.Push(vektori);
     }
