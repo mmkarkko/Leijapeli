@@ -12,10 +12,11 @@ using System.Collections.Generic;
 // kaikista tämän version eroavaisuuksista sekä tunnetuista ongelmista. Täydennä listaa tarvittaessa.
 
 ///@author Miia Arkko
-///@version 8.4.2021
+///@version 9.4.2021
 /// <summary>
 /// Peli, jossa lännetään leijalla, kerätään kerättäviä ja varotaan osumasta mihinkään muuhun.
 /// Peli päättyy, jos törmätään johonkin kuolettavaan tai jos pelaaja pääsee maaliin asti.
+/// Parhaat pisteet pääsevät highscore-listalle. Tämän jälkeen pelin voi aloittaa alusta
 /// </summary>
 public class Leija : PhysicsGame
 {
@@ -32,34 +33,27 @@ public class Leija : PhysicsGame
     private Timer kameranLiikutusAjastin;
 
     /// <summary>
-    /// Aloittaa pelin, lisää peliin taustamusiikin
+    /// Pelin aloittava pääohjelma
     /// Asettaa ikkunan koon
     /// </summary>
     public override void Begin()
     {
-        MediaPlayer.Play("taustamusiikkiVaimea.wav");
-        MediaPlayer.IsRepeating = true;
         SetWindowSize(1920, KENTAN_PITUUS / 10);
-        LuoKentta();
-        Camera.X = Level.Left + 100;
-        peliKaynnissa = true;
+        AloitaPeli();
     }
 
 
     /// <summary>
-    /// Aloittaa pelin uudestaan pelin päättymisen jälkeen
+    /// Aloittaa pelin, aloittaa taustamusiikin
     /// </summary>
-    /// <param name="pelaaja">Pelihahmo, jolla pelataan</param>
-    public void AloitaUudelleenAlusta(PhysicsObject pelaaja)
+    public void AloitaPeli()
     {
-        pelaaja.Destroy();
         MediaPlayer.Play("taustamusiikkiVaimea.wav");
         MediaPlayer.IsRepeating = true;
+        LuoKentta();
         kameranNopeus = 200;
         Camera.X = Level.Left + 100;
-        peliKaynnissa = true;
-        LuoKentta();
-        LisaaNappaimet(pelaaja);
+        peliKaynnissa = true; 
     }
 
 
@@ -267,7 +261,7 @@ public class Leija : PhysicsGame
             PhysicsObject pilvi = new PhysicsObject(HAHMON_KOKO, HAHMON_KOKO + 50);
             if (i < 1) pilvenX = Level.Left + luku;
             else pilvenX = pilvienSijainnit[i - 1].X + luku;
-            pilvi.Y = RandomGen.NextDouble(0, Level.Top - 50);
+            pilvi.Y = RandomGen.NextDouble(-10, Level.Top - 40);
             pilvi.X = pilvenX;
             pilvi.Image = pilvenKuva;
             pilvi.IgnoresCollisionResponse = true;
@@ -303,7 +297,7 @@ public class Leija : PhysicsGame
             do
             {
                 puunSijainti = new Vector(RandomGen.NextDouble(Level.Left, Level.Right), puu.Y);
-            } while (puunSijainti.X! < Level.Left + varoetaisyys);
+            } while (puunSijainti.X! < Level.Left + varoetaisyys); // tarkistetaan, ettei puu tule liian lähelle pelaajan aloituspistettä
             puu.Position = puunSijainti;
             Add(puu);
         }
@@ -326,7 +320,6 @@ public class Leija : PhysicsGame
         }
 
         peliKaynnissa = false;
-
         Gravity = new Vector(0, 0);
         kameranLiikutusAjastin.Stop();
         Camera.Velocity = new Vector(0, 0);
@@ -359,7 +352,8 @@ public class Leija : PhysicsGame
         parhaatIkkuna.Closed += delegate (Window ikkuna)
         {
             DataStorage.Save<ScoreList>(parhaatLista, "leijaParhaatPisteet.xml");
-            AloitaUudelleenAlusta(pelaaja);
+            pelaaja.Destroy();
+            AloitaPeli();
         };
     }
 
