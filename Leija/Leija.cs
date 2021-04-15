@@ -145,7 +145,7 @@ public class Leija : PhysicsGame
 
     /// <summary>
     /// Luo pelikentän ja lisää sinne viholliset, kerattavat kohteet, pelaajan
-    /// Määrittelee törmäyskäsittelijät sekä kameranliikutusajastimen liikutuksen
+    /// Määrittelee törmäyskäsittelijät sekä kameranliikutusajastimen
     /// </summary>
     public void LuoKentta()
     {
