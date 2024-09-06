@@ -38,6 +38,7 @@ Features:
     - Sound effect for various game events.
     - Custom graphics and images for game objects.
     - Possibility to start a new game after game over or reaching the finish line.
+    - Keeps record of high scores.
 
 Objectives:
 Through this project, the aim was to strengthen the following programming skills:
