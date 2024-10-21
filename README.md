@@ -52,6 +52,33 @@ Through this project, the aim was to strengthen the following programming skills
     - Utilizing random number generation for game elements.
     - Applying basic game design principles (scoring, obstacles, collectibles).
 
-Notes:
+1. **Download the repository**:
+   - You can clone this repository using Git:
+     ```bash
+     git clone https://github.com/mmkarkko/Leijapeli
+     ```
+   - Alternatively, download it as a ZIP file from [here](https://github.com/mmkarkko/Leijapeli/blob/master/Leijapeli.zip) and extract it.
 
-    This project is a personal learning tool and is not intended to be shared or used by others.
+2. **Open the project**:
+   - Launch **Visual Studio** and open the solution file (`Leija.sln`) found in the downloaded folder.
+
+3. **Install required libraries**:
+   - Ensure you have the **JyPeli** library installed. You can add it via NuGet Package Manager in Visual Studio:
+     - Right-click on the project in Solution Explorer and select **Manage NuGet Packages**.
+     - Search for "JyPeli" and install the latest version.
+     - Additional info and instructions about Jypeli can be found [here](https://tim.jyu.fi/view/kurssit/jypeli/wiki#gUEja7HYbZtV).
+
+4. **Build the project**:
+   - After ensuring all dependencies are met, build the project by selecting **Build > Build Solution** from the menu.
+
+5. **Run the game**:
+   - Start the game by pressing `F5` or clicking the **Start** button in Visual Studio.
+
+## How to Play
+
+- Use the keyboard to control the kite.
+- Collect stars while avoiding trees and storm clouds.
+
+## Notes
+
+This project is a personal learning tool and is not intended to be shared or used by others.
