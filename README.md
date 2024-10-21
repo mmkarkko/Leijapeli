@@ -51,6 +51,10 @@ Through this project, the aim was to strengthen the following programming skills
     - Utilizing random number generation for game elements.
     - Applying basic game design principles (scoring, obstacles, collectibles).
 
+## Installation Instructions
+
+To run this game on your own machine, follow these steps:
+
 1. **Download the repository**:
    - You can clone this repository using Git:
      ```bash
