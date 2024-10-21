@@ -1,4 +1,4 @@
-Programming 1 Course Project
+##Programming 1 Course Project##
 Description:
 
 This repository contains my personal project for the Programming 1 course at the University of Jyväskylä. 
