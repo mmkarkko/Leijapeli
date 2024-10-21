@@ -1,5 +1,4 @@
-##Programming 1 Course Project##
-Description:
+## Programming 1 Course Project
 
 This repository contains my personal project for the Programming 1 course at the University of Jyväskylä. 
 This project provided hands-on experience with game development concepts and practices, while also reinforcing fundamental programming skills in C#. 
