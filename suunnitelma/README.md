@@ -1,1 +1,1 @@
-Project planning phase picture.
+A planned view of the game.
